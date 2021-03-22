@@ -4,6 +4,7 @@ import re
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from langdetect import detect
 
 colors = [
     "red",
@@ -78,6 +79,13 @@ def get_book_urls():
     return book_urls
 
 
+def english_only(df):
+    df["is_en"] = df[0].apply(detect)
+    df = df[df["is_en"] == "en"]
+    df_en = df.drop("is_en", axis=1)
+    return df_en
+
+
 def main():
     all_sentences = []
     urls = get_book_urls()
@@ -85,7 +93,8 @@ def main():
         color_sentences = get_color_sentences(url)
         all_sentences.extend(color_sentences)
     df = pd.DataFrame(all_sentences)
-    df.to_csv(os.path.join(os.path.dirname(__file__), "raw", "gutenberg.csv"))
+    df_en = english_only(df)
+    df_en.to_csv(os.path.join(os.path.dirname(__file__), "raw", "gutenberg.csv"))
 
 
 if __name__ == "__main__":
