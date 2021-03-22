@@ -38,14 +38,25 @@ def get_color_sentences(url):
     soup = BeautifulSoup(response.content, features="html.parser")
     p_tags = soup.find_all("p")
     for tag in p_tags:
-        chunk = tag.text.replace("\r\n", " ")
-        chunk = re.sub("[\[\d\]]", "", chunk)
-        sentences = re.split("(?<=[.!?]) +", chunk)
-        for sentence in sentences:
-            if has_color(sentence):
-                sentence = " ".join(sentence.split())
-                color_sentences.append(sentence)
+        sentences = preprocess(tag.text)
+        # list comprehension is faster than for loop
+        [
+            color_sentences.append(sentence)
+            for sentence in sentences
+            if has_color(sentence)
+        ]
     return color_sentences
+
+
+def preprocess(text):
+    sentences = []
+    text = text.replace("\r\n", " ")
+    text = re.sub("[\[\d\]]", "", text)
+    chunks = re.split("(?<!Mr|Ms|Dr)(?<!Mrs)\.", text)
+    # list comprehension is faster than for loop
+    [sentences.extend(re.split("(?<=[!?;:]) +", chunk)) for chunk in chunks]
+    sentences = [" ".join(sentence.split()) for sentence in sentences]
+    return sentences
 
 
 def get_book_urls():
