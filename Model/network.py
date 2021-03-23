@@ -1,4 +1,4 @@
-from model import get_config, connect_TPU
+from model import get_config, connect_TPU, TrainTpu
 
 config = get_config('config.json')
 TPU, Strategy, GlobalBatchSize = connect_TPU(config['BatchSizeTpu'])
