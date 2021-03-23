@@ -1,0 +1,8 @@
+{
+	"MaxLength": 256,
+	"BatchSizeTpu": 16,
+	"BatchSize": 64,
+	"Epochs": 100,
+	"LearningRate": 1e-05,
+	"EvaluateEvery": 5
+}
