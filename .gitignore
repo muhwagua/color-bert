@@ -1,5 +1,7 @@
 # custom
 .DS_Store
+.idea/
+.vscode/
 data/dump/
 
 # Byte-compiled / optimized / DLL files
