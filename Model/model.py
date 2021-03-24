@@ -26,8 +26,9 @@ class TrainTpu(tf.keras.Model):
     def __call__(self):  # Train Distributed MLM
         step = 0
         self.MLM_loss_func, self.MLM_train_loss = self.define_mlm_loss_and_metrics()
-        for tensor in self.dataset:
-            self.distributed_MLM_train_step(tensor)
+        for step in range(self.Epoch):
+            for tensor in self.dataset:
+                self.distributed_MLM_train_step(tensor)
             step += 1
 
             if step % self.evaluate_every == 0:
