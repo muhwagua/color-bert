@@ -1,0 +1,5 @@
+Update Note (업데이트 예정)
+
+1. Trainer 에 tensor board 추가
+2. Trainer 에 모델 저장 기능 추가
+3. trainer 에 저장된 모델 불러오는 기능 추가
