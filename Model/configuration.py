@@ -1,16 +1,13 @@
-import json
-from collections import OrderedDict
+import argparse
 
-config = OrderedDict()
+parser = argparse.ArgumentParser()
+parser.add_argument('--max_len',default=256)
+parser.add_argument('--batch_size_TPU',default=16)
+parser.add_argument('--batch_size',default=64)
+parser.add_argument('--epochs',default=100)
+parser.add_argument('--learning_rate',default=1e-10)
+parser.add_argument('--evaluate_every',default=5)
+parser.add_argument('--vanilla_bert',default='bert_base_uncased')
 
-config['MaxLength'] = 256
-config['BatchSizeTpu'] = 16  # per TPU core
-config['BatchSize'] = 64
-config['Epochs'] = 100
-config['LearningRate'] = 1e-5
-config['EvaluateEvery'] = 5
-
-
-with open('config.json','w',encoding='utf-8') as fp:
-    json.dump(config, fp, ensure_ascii=False, indent='\t')
+args=parser.parse_args()
 
