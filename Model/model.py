@@ -1,10 +1,5 @@
-import json
 import tensorflow as tf
-
-def get_config(path):
-    with open(path, 'r') as f:
-        json_data = json.load(f)
-    return json_data
+from transformers import TFBertForMaskedLM
 
 def connect_TPU(BatchSizeTpu):
     tpu = tf.distribute.cluster_resolver.TPUClusterResolver()
@@ -21,16 +16,15 @@ def connect_TPU(BatchSizeTpu):
 # config: {'MaxLength': , 'BatchSizeTpu': , 'BatchSize': , 'Epochs': , 'LearningRate': ,'EvaluateEvery}
 
 class TrainTpu(tf.keras.Model):
-    def __init__(self, dataset, model, config, Tpu, Strategy, GlobalBatchSize):
+    def __init__(self, dataset, model, optimizer, args, Tpu, Strategy, GlobalBatchSize):
         super(TrainTpu, self).__init__()
         self.dataset = dataset
         self.Strategy = Strategy
         self.MLM_Bert = model
         self.GlobalBatchSize = GlobalBatchSize
-        self.Epoch = config['Epochs']
-        self.evaluate_every = config['EvaluateEvery']
-        self.LearningRate = config['LearningRate']
-        self.Optimizer = tf.keras.optimizers.Adam(learning_rate=self.LearningRate)
+        self.Epoch = args.epochs
+        self.evaluate_every = args.evaluate_every
+        self.Optimizer = optimizer
 
     def __call__(self):  # Train Distributed MLM
         step = 0
@@ -76,7 +70,7 @@ class TrainTpu(tf.keras.Model):
 
         return MLM_loss, train_mlm_loss_metric
 
-    def masked_sparse_categorical_crossentropy(self,y_true, y_pred):
+    def masked_sparse_categorical_crossentropy(self, y_true, y_pred):
         y_true_masked = tf.boolean_mask(y_true, tf.not_equal(y_true, -1))
         y_pred_masked = tf.boolean_mask(y_pred, tf.not_equal(y_true, -1))
 
@@ -84,3 +78,14 @@ class TrainTpu(tf.keras.Model):
                                                                y_pred_masked,
                                                                from_logits=True)
         return loss
+
+
+def get_model_and_optimizer(Strategy,model,LR,checkpoint=False):
+    with Strategy.scope():
+        if checkpoint:
+            pass
+        else:
+            model = TFBertForMaskedLM.from_pretrained(model,output_attentions=True)
+            optimizer = tf.keras.optimizers.Adam(learning_rate=LR)
+    return model, optimizer
+
