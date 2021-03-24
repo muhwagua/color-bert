@@ -12,9 +12,6 @@ def connect_TPU(BatchSizeTpu):
 
     return tpu, strategy, global_batch_size
 
-
-# config: {'MaxLength': , 'BatchSizeTpu': , 'BatchSize': , 'Epochs': , 'LearningRate': ,'EvaluateEvery}
-
 class TrainTpu(tf.keras.Model):
     def __init__(self, dataset, model, optimizer, args, Tpu, Strategy, GlobalBatchSize):
         super(TrainTpu, self).__init__()
@@ -88,4 +85,24 @@ def get_model_and_optimizer(Strategy,model,LR,checkpoint=False):
             model = TFBertForMaskedLM.from_pretrained(model,output_attentions=True)
             optimizer = tf.keras.optimizers.Adam(learning_rate=LR)
     return model, optimizer
+
+
+
+def create_distributed_dataset(Strategy,X, y=None, global_batch_size = 16,training=False):
+    dataset = tf.data.Dataset.from_tensor_slices(X)
+    AUTO = tf.data.experimental.AUTOTUNE
+    if y is not None:
+        dataset_y = tf.data.Dataset.from_tensor_slices(y)
+        dataset = tf.data.Dataset.zip((dataset, dataset_y))
+
+    if training:
+        dataset = dataset.shuffle(len(X)).repeat()
+
+    dataset = dataset.batch(global_batch_size).prefetch(AUTO)
+    dist_dataset = Strategy.experimental_distribute_dataset(dataset)
+
+    return dist_dataset
+
+
+
 
