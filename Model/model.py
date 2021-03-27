@@ -7,7 +7,7 @@ def connect_TPU(BatchSizeTpu):
     tf.config.experimental_connect_to_cluster(tpu)
     tf.tpu.experimental.initialize_tpu_system(tpu)
 
-    strategy = tf.distribute.experimental.TPUStrategy(tpu)
+    strategy = tf.distribute.TPUStrategy(tpu)
     global_batch_size = BatchSizeTpu * strategy.num_replicas_in_sync
 
     return tpu, strategy, global_batch_size
