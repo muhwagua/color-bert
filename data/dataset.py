@@ -1,3 +1,4 @@
+import os
 import random
 import re
 
@@ -5,7 +6,7 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class ColorDataset(Dataset):
-    def __init__(self, data_path, color_ratio):
+    def __init__(self, data_path="all.txt", color_ratio=0.5):
         with open(data_path) as f:
             self.data = f.read().splitlines()
         self.color_ratio = color_ratio
@@ -44,7 +45,7 @@ def color_mask(sentence):
     ]
     matches = []
     for color in colors:
-        match = re.search(f"(\s|^){color}(\s|[.!?\\-])", sentence)
+        match = re.search(f"(\s|^){color}(\s|[.!?\\-]|$)", sentence)
         if match:
             matches.append(match.span())
     (start, end) = random.choice(matches)
