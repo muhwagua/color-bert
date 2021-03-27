@@ -77,12 +77,13 @@ class MaskedLMDataset():
         batch_encoding = self.tokenizer.batch_encode_plus(lines,return_attention_mask=False,return_token_type_ids=False,padding=True, truncation=True,max_length=self.max_len)
         return batch_encoding["input_ids"]
 
-#from transformers import BertTokenizer
-#txt_url = "https://raw.githubusercontent.com/muhwagua/color-bert/main/data/all.txt"
-#tokenizer = BertTokenizer.from_pretrained(args.vanilla_bert)
+from transformers import BertTokenizer
+txt_url = "https://raw.githubusercontent.com/muhwagua/color-bert/main/data/all.txt"
+tokenizer = BertTokenizer.from_pretrained(args.vanilla_bert)
 
-#Masker = MaskedLMDataset(txt_url,args,tokenizer)
-#data = Masker()
-#print(data.keys())
-#print(data['non_masked'][:10])
-#print(data['masked'][:10])
+Masker = MaskedLMDataset(txt_url,args,tokenizer)
+data = Masker()
+print(data.keys())
+print(data['non_masked'][:10])
+print(data['masked'][:10])
+print(len(data['masked']),len(data['non_masked']))
