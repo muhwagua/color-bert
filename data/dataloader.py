@@ -3,16 +3,12 @@ import re
 import urllib.request
 import torch
 from torch.utils.data import DataLoader, Dataset
-from transformers import (
-    BertConfig,
-    BertTokenizer
-)
+from transformers import BertConfig, BertTokenizer
 from argparse import Namespace
 
 
-
 txt_url = "https://raw.githubusercontent.com/muhwagua/color-bert/main/data/all.txt"
-urllib.request.urlretrieve(txt_url, 'train.txt')
+urllib.request.urlretrieve(txt_url, "train.txt")
 
 args = Namespace()
 args.train = "train.txt"
@@ -22,8 +18,8 @@ args.batch_size = 4
 args.color_ratio = 0.5
 
 
-
 tokenizer = BertTokenizer.from_pretrained(args.model_name)
+
 
 class MaskedLMDataset(Dataset):
     def __init__(self, file, color_ratio, tokenizer, masking):
@@ -67,7 +63,7 @@ class MaskedLMDataset(Dataset):
             if match:
                 global start, end
                 (start, end) = random.choice([match.span()])
-        return line[: start + 1] + "[MASK]" + line[end - 1:]
+        return line[: start + 1] + "[MASK]" + line[end - 1 :]
 
     def random_mask(self, line, masking=True):
         words = line.split()
@@ -89,15 +85,21 @@ class MaskedLMDataset(Dataset):
     def encode_lines(self, lines, masked, masking):
         if masking == True:
             batch_encoding = self.tokenizer(
-                masked, add_special_tokens=True, truncation=True, padding=True,
-                max_length=args.max_len
+                masked,
+                add_special_tokens=True,
+                truncation=True,
+                padding=True,
+                max_length=args.max_len,
             )
             return batch_encoding["input_ids"]
 
         elif masking == False:
             batch_encoding = self.tokenizer(
-                lines, add_special_tokens=True, truncation=True, padding=True,
-                max_length=args.max_len
+                lines,
+                add_special_tokens=True,
+                truncation=True,
+                padding=True,
+                max_length=args.max_len,
             )
             return batch_encoding["input_ids"]
 
@@ -106,4 +108,3 @@ class MaskedLMDataset(Dataset):
 
     def __getitem(self, idx):
         return torch.tensor(self.ids[idx], dtype=torch.long)
-    

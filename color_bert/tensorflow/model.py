@@ -1,6 +1,7 @@
 import tensorflow as tf
 from transformers import TFBertForMaskedLM
 
+
 def connect_TPU(BatchSizeTpu):
     tpu = tf.distribute.cluster_resolver.TPUClusterResolver()
 
@@ -11,6 +12,7 @@ def connect_TPU(BatchSizeTpu):
     global_batch_size = BatchSizeTpu * strategy.num_replicas_in_sync
 
     return tpu, strategy, global_batch_size
+
 
 class TrainTpu(tf.keras.Model):
     def __init__(self, dataset, model, optimizer, args, Tpu, Strategy, GlobalBatchSize):
@@ -51,7 +53,9 @@ class TrainTpu(tf.keras.Model):
             loss = self.MLM_loss_func(Label, prediction)
 
         gradients = tape.gradient(loss, self.MLM_Bert.trainable_variables)
-        self.Optimizer.apply_gradients(zip(gradients, self.MLM_Bert.trainable_variables))
+        self.Optimizer.apply_gradients(
+            zip(gradients, self.MLM_Bert.trainable_variables)
+        )
         self.MLM_train_loss.update_state(loss)
 
     def define_mlm_loss_and_metrics(self):
@@ -61,7 +65,8 @@ class TrainTpu(tf.keras.Model):
             def MLM_loss(labels, predictions):
                 per_example_loss = mlm_loss_object(labels, predictions)
                 loss = tf.nn.compute_average_loss(
-                    per_example_loss, global_batch_size=self.GlobalBatchSize)
+                    per_example_loss, global_batch_size=self.GlobalBatchSize
+                )
                 return loss
 
             train_mlm_loss_metric = tf.keras.metrics.Mean()
@@ -72,24 +77,25 @@ class TrainTpu(tf.keras.Model):
         y_true_masked = tf.boolean_mask(y_true, tf.not_equal(y_true, -1))
         y_pred_masked = tf.boolean_mask(y_pred, tf.not_equal(y_true, -1))
 
-        loss = tf.keras.losses.sparse_categorical_crossentropy(y_true_masked,
-                                                               y_pred_masked,
-                                                               from_logits=True)
+        loss = tf.keras.losses.sparse_categorical_crossentropy(
+            y_true_masked, y_pred_masked, from_logits=True
+        )
         return loss
 
 
-def get_model_and_optimizer(Strategy,model,LR,checkpoint=False):
+def get_model_and_optimizer(Strategy, model, LR, checkpoint=False):
     with Strategy.scope():
         if checkpoint:
             pass
         else:
-            model = TFBertForMaskedLM.from_pretrained(model,output_attentions=True)
+            model = TFBertForMaskedLM.from_pretrained(model, output_attentions=True)
             optimizer = tf.keras.optimizers.Adam(learning_rate=LR)
     return model, optimizer
 
 
-
-def create_distributed_dataset(Strategy,X, y=None, global_batch_size = 16,training=False):
+def create_distributed_dataset(
+    Strategy, X, y=None, global_batch_size=16, training=False
+):
     dataset = tf.data.Dataset.from_tensor_slices(X)
     AUTO = tf.data.experimental.AUTOTUNE
     if y is not None:
@@ -103,7 +109,3 @@ def create_distributed_dataset(Strategy,X, y=None, global_batch_size = 16,traini
     dist_dataset = Strategy.experimental_distribute_dataset(dataset)
 
     return dist_dataset
-
-
-
-
