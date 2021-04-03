@@ -1,0 +1,4 @@
+pytorch
+transformers
+efficientnet-pytorch
+Pillow
