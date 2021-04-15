@@ -1,0 +1,18 @@
+{
+    "model": {
+        "bert": "microsoft/deberta-base",
+        "cnn": "efficientnet-b0",
+        "colorbert": "notebooks/lightning_logs/deberta_color-0.6/version_0/checkpoints/deberta_color:0.6-epoch:10-val_loss=2.19.ckpt",
+        "freeze_cnn": true
+    },
+    "data": {
+        "train_batch_size": 128,
+        "valid_batch_size": 128,
+        "valid_split": 0.1
+    },
+    "name": "colobert_06",
+    "device": "cuda",
+    "num_epochs": 15,
+    "save_interval": 4,
+    "log_interval": 1
+}
