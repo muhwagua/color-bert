@@ -3,11 +3,6 @@
 .idea/
 .vscode/
 data/dump/
-data/coco/
-notebooks/lightning_logs/
-notebooks/runs/
-checkpoints/
-logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,11 +1,11 @@
 import random
 import re
 import urllib.request
-from argparse import Namespace
-
 import torch
 from torch.utils.data import DataLoader, Dataset
 from transformers import BertConfig, BertTokenizer
+from argparse import Namespace
+
 
 txt_url = "https://raw.githubusercontent.com/muhwagua/color-bert/main/data/all.txt"
 urllib.request.urlretrieve(txt_url, "train.txt")
