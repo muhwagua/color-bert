@@ -1,3 +1,4 @@
+import pytorch_lightning as pl
 import torch
 from efficientnet_pytorch import EfficientNet
 from torch import nn
@@ -7,8 +8,6 @@ from transformers import (
     DebertaForMaskedLM,
     get_linear_schedule_with_warmup,
 )
-
-import pytorch_lightning as pl
 
 
 class VQAModel(nn.Module):

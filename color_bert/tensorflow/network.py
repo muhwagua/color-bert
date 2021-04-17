@@ -1,11 +1,12 @@
 from configuration import args
+from transformers import BertTokenizer
+
 from model import (
     TrainTpu,
     connect_TPU,
     create_distributed_dataset,
     get_model_and_optimizer,
 )
-from transformers import BertTokenizer
 
 txt_url = "https://raw.githubusercontent.com/muhwagua/color-bert/main/data/all.txt"
 tokenizer = BertTokenizer.from_pretrained(args.vanilla_bert)

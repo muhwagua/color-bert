@@ -26,10 +26,7 @@ if __name__ == "__main__":
         help="path to config json file",
     )
     parser.add_argument(
-        "--checkpoint_path",
-        type=str,
-        default="",
-        help="path to checkpoint file",
+        "--checkpoint_path", type=str, default="", help="path to checkpoint file",
     )
     args = parser.parse_args()
     set_seed()

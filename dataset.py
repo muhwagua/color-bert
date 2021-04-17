@@ -40,19 +40,13 @@ def make_loaders(data_config):
     )
     test_dataset = VQADataset("test")
     train_loader = DataLoader(
-        train_dataset,
-        batch_size=data_config.train_batch_size,
-        shuffle=True,
+        train_dataset, batch_size=data_config.train_batch_size, shuffle=True,
     )
     valid_loader = DataLoader(
-        valid_dataset,
-        batch_size=data_config.valid_batch_size,
-        shuffle=True,
+        valid_dataset, batch_size=data_config.valid_batch_size, shuffle=True,
     )
     test_loader = DataLoader(
-        test_dataset,
-        batch_size=data_config.valid_batch_size,
-        shuffle=True,
+        test_dataset, batch_size=data_config.valid_batch_size, shuffle=True,
     )
     return train_loader, valid_loader, test_loader
 

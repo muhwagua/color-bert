@@ -27,9 +27,11 @@ class AttrDict(Namespace):
         value = AttrDict(value) if isinstance(value, dict) else value
         super().__setattr__(key, value)
 
+
 def load_config(file_path: str) -> AttrDict:
     with open(file_path) as f:
         return AttrDict(json.load(f))
+
 
 def load_trainer(checkpoint_path):
     # avoid circular import
