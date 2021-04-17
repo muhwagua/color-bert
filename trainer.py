@@ -88,7 +88,7 @@ class Trainer:
     def test(self):
         num_total = 0
         num_correct = 0
-        for (questions, images, answers, types) in self.test_loader:
+        for (questions, images, answers, types) in tqdm(self.test_loader):
             images = images.to(self.device)
             answers = answers.to(self.device)
             tokens = self.tokenize(questions)
