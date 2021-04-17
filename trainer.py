@@ -44,11 +44,17 @@ class Trainer:
             self.epoch += 1
             train_loss = self._train_epoch()
             valid_loss = self._valid_epoch()
-            # if self.epoch % self.config.log_interval == 0:
-            #     self.log(train_loss, valid_loss)
+            if self.epoch % self.config.log_interval == 0:
+                self.log(train_loss, valid_loss)
             if self.epoch % self.config.save_interval == 0:
                 self.save_checkpoint()
         self.save_checkpoint()
+
+    def tokenize(self, questions):
+        tokens = self.tokenizer(
+            list(questions), padding=True, truncation=True, return_tensors="pt"
+        ).to(self.device)
+        return tokens
 
     def _train_epoch(self):
         total_loss = 0
@@ -57,9 +63,7 @@ class Trainer:
             assert torch.isnan(images).sum() == 0
             images = images.to(self.device)
             answers = answers.to(self.device)
-            tokens = self.tokenizer(
-                list(questions), padding=True, truncation=True, return_tensors="pt"
-            ).to(self.device)
+            tokens = self.tokenize(questions)
             self.optimizer.zero_grad()
             preds = self.model(images, tokens)
             loss = F.cross_entropy(preds, answers)
@@ -75,13 +79,25 @@ class Trainer:
         for (questions, images, answers, types) in self.valid_loader:
             images = images.to(self.device)
             answers = answers.to(self.device)
-            tokens = self.tokenizer(
-                list(questions), padding=True, truncation=True, return_tensors="pt"
-            ).to(self.device)
+            tokens = self.tokenize(questions)
             preds = self.model(images, tokens)
             loss = F.cross_entropy(preds, answers)
             total_loss += loss.item()
         return total_loss / len(self.valid_loader)
+
+    def test(self):
+        num_total = 0
+        num_correct = 0
+        for (questions, images, answers, types) in self.test_loader:
+            images = images.to(self.device)
+            answers = answers.to(self.device)
+            tokens = self.tokenize(questions)
+            preds = self.model(images, tokens)
+            # preds.shape == (batch_size, 430)
+            pred_idx = preds.argmax(dim=1)
+            num_correct += (pred_idx == answers).sum()
+            num_total += len(answers)
+        return num_correct / num_total
 
     def log(self, train_loss, valid_loss):
         self.writer.add_scalar("train/loss", train_loss, self.epoch)
