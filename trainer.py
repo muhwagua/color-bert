@@ -40,12 +40,17 @@ class Trainer:
         self.save_path = save_path
 
     def train(self):
+        best_valid_loss = float("-inf")
         for _ in tqdm(range(self.config.num_epochs), leave=False):
             self.epoch += 1
             train_loss = self._train_epoch()
             valid_loss = self._valid_epoch()
             if self.epoch % self.config.log_interval == 0:
                 self.log(train_loss, valid_loss)
+            if valid_loss < best_valid_loss:
+                best_valid_loss = valid_loss
+                self.save_checkpoint("best")
+                continue
             if self.epoch % self.config.save_interval == 0:
                 self.save_checkpoint()
         self.save_checkpoint()
@@ -88,7 +93,7 @@ class Trainer:
     def test(self):
         num_total = 0
         num_correct = 0
-        for (questions, images, answers, types) in tqdm(self.test_loader):
+        for (questions, images, answers, types) in tqdm(self.valid_loader):
             images = images.to(self.device)
             answers = answers.to(self.device)
             tokens = self.tokenize(questions)
@@ -112,8 +117,10 @@ class Trainer:
         stdout += f"{key}: {value:7.4f}, "
         tqdm.write(stdout.strip()[:-1])
 
-    def save_checkpoint(self):
-        path = os.path.join(self.save_path, f"{self.epoch}.pt")
+    def save_checkpoint(self, title=""):
+        if not title:
+            title = self.epoch
+        path = os.path.join(self.save_path, f"{title}.pt")
         if not os.path.isfile(path):
             state_dict = {
                 "epoch": self.epoch,
